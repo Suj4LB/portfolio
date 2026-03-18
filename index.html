@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sujal Bhandari — DevOps Engineer</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e0a;
+    --bg2: #0d120d;
+    --bg3: #111711;
+    --panel: #0f160f;
+    --border: #1e2d1e;
+    --green: #00ff41;
+    --green-dim: #00cc33;
+    --green-pale: #00ff4120;
+    --green-glow: 0 0 10px #00ff4160, 0 0 30px #00ff4120;
+    --amber: #ffb700;
+    --amber-dim: #cc9200;
+    --cyan: #00d4ff;
+    --red: #ff3355;
+    --purple: #b47fff;
+    --purple-dim: #7b2fff;
+    --white: #d4f0d4;
+    --muted: #4a6b4a;
+    --font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font-mono);
+    overflow-x: hidden;
+    cursor: none;
+    animation: flicker 8s infinite;
+  }
+
+  #cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--green);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    box-shadow: var(--green-glow);
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  @keyframes flicker {
+    0%,100%{opacity:1;} 92%{opacity:1;} 93%{opacity:0.96;} 94%{opacity:1;} 96%{opacity:0.98;} 97%{opacity:1;}
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top:0; left:0; right:0; z-index:500;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 2rem; height:52px;
+    background:rgba(10,14,10,0.94); border-bottom:1px solid var(--border);
+    backdrop-filter:blur(12px);
+  }
+  .nav-logo { color:var(--green); font-size:0.85rem; font-weight:700; letter-spacing:0.05em; text-shadow:var(--green-glow); }
+  .nav-logo span { color:var(--muted); font-weight:300; }
+  .nav-links { display:flex; gap:1.5rem; }
+  .nav-links a { color:var(--muted); text-decoration:none; font-size:0.72rem; letter-spacing:0.08em; transition:color 0.2s,text-shadow 0.2s; }
+  .nav-links a:hover { color:var(--green); text-shadow:var(--green-glow); }
+  .nav-status { display:flex; align-items:center; gap:0.5rem; font-size:0.7rem; color:var(--muted); }
+  .status-dot { width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:var(--green-glow); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.6;transform:scale(1.3);} }
+
+  .scroll-progress { position:fixed; top:52px; left:0; height:2px; background:var(--green); box-shadow:var(--green-glow); z-index:499; width:0%; transition:width 0.1s; }
+
+  section { padding:100px 0 60px; }
+  .container { max-width:1160px; margin:0 auto; padding:0 2rem; }
+
+  /* ── HERO ── */
+  /* Two-column layout: left = text, right = terminal. No overlap. */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 80px 0 0;
+  }
+  #hero::before {
+    content:''; position:absolute; inset:0;
+    background-image: linear-gradient(var(--border) 1px,transparent 1px), linear-gradient(90deg,var(--border) 1px,transparent 1px);
+    background-size:50px 50px; opacity:0.25; animation:gridMove 20s linear infinite;
+  }
+  @keyframes gridMove { 0%{background-position:0 0;} 100%{background-position:50px 50px;} }
+  #hero::after {
+    content:''; position:absolute; width:700px; height:700px;
+    background:radial-gradient(circle,#00ff4106 0%,transparent 70%);
+    top:50%; left:30%; transform:translate(-50%,-50%);
+    animation:breathe 5s ease-in-out infinite; pointer-events:none;
+  }
+  @keyframes breathe { 0%,100%{transform:translate(-50%,-50%) scale(1);} 50%{transform:translate(-50%,-50%) scale(1.15);} }
+
+  .hero-grid {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .hero-left {}
+
+  .terminal-prompt {
+    color:var(--muted); font-size:0.8rem; margin-bottom:0.8rem;
+    opacity:0; animation:fadeUp 0.6s ease 0.3s forwards;
+  }
+  .terminal-prompt .p-green { color:var(--green); }
+  .terminal-prompt .p-cyan  { color:var(--cyan); }
+
+  .hero-name {
+    font-size:clamp(2.6rem,5.5vw,5.2rem); font-weight:700; line-height:1;
+    color:var(--green); text-shadow:var(--green-glow); letter-spacing:-0.02em;
+    opacity:0; animation:fadeUp 0.7s ease 0.5s forwards;
+    display:inline-block;
+  }
+  .hero-name:hover { animation:glitch 0.5s steps(2) infinite; opacity:1; color:var(--green); }
+  @keyframes glitch {
+    0%  { text-shadow:-2px 0 var(--cyan),2px 0 var(--red),var(--green-glow); transform:skewX(0deg); }
+    25% { text-shadow:2px 0 var(--cyan),-2px 0 var(--red),var(--green-glow); transform:skewX(-1.5deg); }
+    50% { text-shadow:-3px 0 var(--red),3px 0 var(--cyan),var(--green-glow); transform:skewX(1deg); }
+    75% { text-shadow:2px 0 var(--cyan),-2px 0 var(--red),var(--green-glow); transform:skewX(-0.5deg); }
+    100%{ text-shadow:-2px 0 var(--cyan),2px 0 var(--red),var(--green-glow); transform:skewX(0deg); }
+  }
+
+  .hero-title {
+    font-size:clamp(0.85rem,1.8vw,1.1rem); color:var(--amber); font-weight:300;
+    letter-spacing:0.12em; margin:0.9rem 0 1.4rem;
+    opacity:0; animation:fadeUp 0.7s ease 0.7s forwards;
+  }
+  .hero-title::before { content:'// '; color:var(--muted); }
+
+  .hero-desc {
+    max-width:520px; font-size:0.82rem; line-height:1.85; color:var(--muted);
+    opacity:0; animation:fadeUp 0.7s ease 0.9s forwards;
+    border-left:2px solid var(--border); padding-left:1rem;
+  }
+  .hero-desc .hl { color:var(--green-dim); }
+
+  .hero-cta {
+    display:flex; gap:1rem; margin-top:2.2rem;
+    opacity:0; animation:fadeUp 0.7s ease 1.1s forwards; flex-wrap:wrap;
+  }
+  .btn { font-family:var(--font-mono); font-size:0.72rem; letter-spacing:0.1em; padding:0.65rem 1.4rem; text-decoration:none; cursor:none; transition:all 0.2s; display:inline-block; }
+  .btn-primary { background:var(--green); color:var(--bg); font-weight:700; clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px)); }
+  .btn-primary:hover { background:var(--green-dim); box-shadow:var(--green-glow); transform:translateY(-2px); }
+  .btn-outline { border:1px solid var(--border); color:var(--muted); background:transparent; }
+  .btn-outline:hover { border-color:var(--green); color:var(--green); box-shadow:inset 0 0 20px #00ff4108; }
+
+  .hero-stats {
+    display:flex; gap:2.5rem; margin-top:3rem; padding-top:2rem; border-top:1px solid var(--border);
+    opacity:0; animation:fadeUp 0.7s ease 1.3s forwards; flex-wrap:wrap;
+  }
+  .stat-num { font-size:1.7rem; font-weight:700; color:var(--green); text-shadow:var(--green-glow); display:block; }
+  .stat-label { font-size:0.62rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; }
+
+  .hero-right {
+    opacity:0; animation:fadeLeft 0.8s ease 1.4s forwards;
+  }
+  @keyframes fadeLeft { from{opacity:0;transform:translateX(30px);} to{opacity:1;transform:translateX(0);} }
+  @keyframes fadeUp   { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+
+  /* ── TERMINAL WINDOW ── */
+  .terminal-window { background:var(--panel); border:1px solid var(--border); border-radius:6px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.55),inset 0 1px 0 #ffffff08; }
+  .terminal-bar { background:#0d140d; border-bottom:1px solid var(--border); padding:0.6rem 1rem; display:flex; align-items:center; gap:0.5rem; }
+  .t-dot { width:10px; height:10px; border-radius:50%; }
+  .t-dot.red{background:#ff5f57;} .t-dot.yellow{background:#febc2e;} .t-dot.green{background:#28c840;}
+  .t-bar-title { flex:1; text-align:center; font-size:0.63rem; color:var(--muted); letter-spacing:0.05em; }
+  .terminal-body { padding:1rem 1.2rem; font-size:0.73rem; line-height:1.9; }
+  .t-line { display:block; }
+  .t-ps1{color:var(--green);} .t-cmd{color:var(--white);} .t-out{color:var(--muted);}
+  .t-key{color:var(--amber);} .t-val{color:var(--cyan);} .t-success{color:var(--green);}
+  .blink { display:inline-block; width:8px; height:14px; background:var(--green); vertical-align:middle; animation:blink 1s step-end infinite; box-shadow:var(--green-glow); margin-left:2px; }
+  @keyframes blink { 50%{opacity:0;} }
+
+  /* ── SECTION HEADERS ── */
+  .section-header { margin-bottom:3rem; }
+  .section-tag { font-size:0.68rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem; }
+  .section-tag::before { content:''; width:30px; height:1px; background:var(--border); }
+  .section-tag::after  { content:''; flex:1; height:1px; background:var(--border); }
+  .section-title { font-size:clamp(1.4rem,3vw,2.1rem); font-weight:700; color:var(--white); letter-spacing:-0.02em; }
+  .section-title .accent { color:var(--green); text-shadow:var(--green-glow); }
+
+  /* ── EXPERIENCE ── */
+  .exp-timeline { position:relative; }
+  .exp-timeline::before { content:''; position:absolute; left:0; top:0; bottom:0; width:1px; background:linear-gradient(to bottom,transparent,var(--border) 10%,var(--border) 90%,transparent); }
+  .exp-item { padding:0 0 3rem 2.5rem; position:relative; opacity:0; transform:translateX(-20px); transition:opacity 0.5s,transform 0.5s; }
+  .exp-item.visible { opacity:1; transform:translateX(0); }
+  .exp-dot { position:absolute; left:-5px; top:6px; width:11px; height:11px; border-radius:50%; background:var(--bg); border:2px solid var(--green); box-shadow:0 0 8px var(--green); }
+  .exp-meta { display:flex; align-items:flex-start; gap:1rem; flex-wrap:wrap; margin-bottom:0.8rem; }
+  .exp-company { font-size:1.1rem; font-weight:700; color:var(--green); text-shadow:0 0 8px #00ff4140; }
+  .exp-badge { font-size:0.63rem; padding:0.2rem 0.6rem; border:1px solid var(--amber-dim); color:var(--amber); border-radius:2px; letter-spacing:0.08em; text-transform:uppercase; align-self:center; }
+  .exp-badge.current { border-color:var(--green); color:var(--green); background:var(--green-pale); animation:pulse-border 2s infinite; }
+  @keyframes pulse-border { 50%{box-shadow:0 0 8px var(--green);} }
+  .exp-role { font-size:0.8rem; color:var(--white); margin-bottom:0.3rem; letter-spacing:0.05em; }
+  .exp-date { font-size:0.7rem; color:var(--muted); margin-bottom:1rem; }
+  .exp-tasks { list-style:none; }
+  .exp-tasks li { font-size:0.77rem; color:var(--muted); line-height:1.7; padding:0.2rem 0 0.2rem 1.2rem; position:relative; }
+  .exp-tasks li::before { content:'▸'; position:absolute; left:0; color:var(--green-dim); }
+  .exp-tasks li span { color:var(--white); }
+
+  /* ── SKILLS ── */
+  .skills-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(255px,1fr)); gap:1.4rem; }
+  .skill-card { background:var(--panel); border:1px solid var(--border); padding:1.4rem; position:relative; overflow:hidden; transition:border-color 0.3s,transform 0.3s; opacity:0; transform:translateY(20px); clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%); }
+  .skill-card.visible { opacity:1; transform:translateY(0); }
+  .skill-card:hover { border-color:var(--green); transform:translateY(-4px); box-shadow:0 8px 30px rgba(0,255,65,0.08); }
+  .skill-card::before { content:''; position:absolute; top:0; right:0; width:16px; height:16px; background:var(--border); clip-path:polygon(0 0,100% 100%,100% 0); transition:background 0.3s; }
+  .skill-card:hover::before { background:var(--green); }
+  .skill-card.ai-card:hover { border-color:#7b2fff80; box-shadow:0 8px 30px rgba(123,47,255,0.1); }
+  .skill-card.ai-card:hover::before { background:var(--purple-dim); }
+  .skill-card-icon { font-size:1.4rem; margin-bottom:0.7rem; }
+  .skill-card-title { font-size:0.78rem; font-weight:700; color:var(--white); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:0.9rem; }
+  .skill-card-title.ai { color:var(--purple); }
+  .skill-tags { display:flex; flex-wrap:wrap; gap:0.35rem; }
+  .skill-tag { font-size:0.63rem; padding:0.18rem 0.45rem; background:var(--bg3); border:1px solid var(--border); color:var(--muted); letter-spacing:0.04em; border-radius:2px; }
+  .skill-tag.highlight { border-color:var(--green-dim); color:var(--green); background:var(--green-pale); }
+  .skill-tag.ai-tag { border-color:#7b2fff50; color:var(--purple); background:#7b2fff12; }
+
+  /* ── PROJECTS ── */
+  .projects-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.5rem; }
+  .project-card {
+    background:var(--panel); border:1px solid var(--border); padding:1.6rem;
+    display:flex; flex-direction:column; gap:0.9rem; position:relative; overflow:hidden;
+    transition:border-color 0.3s,transform 0.3s,box-shadow 0.3s;
+    opacity:0; transform:translateY(20px);
+    clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%);
+  }
+  .project-card.visible { opacity:1; transform:translateY(0); }
+  .project-card::before { content:''; position:absolute; top:0; right:0; width:16px; height:16px; background:var(--border); clip-path:polygon(0 0,100% 100%,100% 0); transition:background 0.3s; }
+  .project-card:hover { border-color:var(--green); transform:translateY(-4px); box-shadow:0 8px 30px rgba(0,255,65,0.07); }
+  .project-card:hover::before { background:var(--green); }
+  .project-header { display:flex; justify-content:space-between; align-items:center; }
+  .project-type { font-size:0.63rem; letter-spacing:0.08em; text-transform:uppercase; font-weight:700; color:var(--amber); }
+  .project-status { font-size:0.6rem; letter-spacing:0.05em; }
+  .project-status.live { color:var(--green); }
+  .project-status.wip  { color:var(--amber); }
+  .project-title { font-size:0.92rem; font-weight:700; color:var(--white); line-height:1.3; }
+  .project-desc { font-size:0.76rem; color:var(--muted); line-height:1.75; flex:1; }
+  .project-stack { display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.2rem; }
+  .p-tag { font-size:0.62rem; padding:0.18rem 0.45rem; background:var(--bg3); border:1px solid var(--border); color:var(--muted); border-radius:2px; letter-spacing:0.04em; }
+
+  /* ── ABOUT ── */
+  .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:start; }
+  .about-text p { font-size:0.82rem; line-height:1.9; color:var(--muted); margin-bottom:1rem; }
+  .about-text p .hl { color:var(--white); }
+  .about-text p .hl-g { color:var(--green); }
+
+  /* ── INTERACTIVE SYSMON ── */
+  #sysmon .sysmon-shell {
+    background:var(--panel); border:1px solid var(--border); border-radius:6px;
+    overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  }
+  #sysmon .sysmon-bar {
+    background:#0d140d; border-bottom:1px solid var(--border);
+    padding:0.6rem 1rem; display:flex; align-items:center; gap:0.5rem;
+  }
+  #sysmon .sysmon-bar span { flex:1; text-align:center; font-size:0.63rem; color:var(--muted); }
+  #sysmon .sysmon-body { padding:1.2rem 1.4rem; }
+
+  .sysmon-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-bottom:1.4rem; }
+
+  .sysmon-metric {
+    background:var(--bg3); border:1px solid var(--border); border-radius:4px; padding:1rem 1.1rem;
+  }
+  .sm-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem; }
+  .sm-label { font-size:0.65rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; }
+  .sm-value { font-size:1.1rem; font-weight:700; color:var(--green); text-shadow:var(--green-glow); font-variant-numeric:tabular-nums; }
+  .sm-bar-wrap { background:#0a0e0a; border-radius:2px; height:6px; overflow:hidden; margin-bottom:0.4rem; }
+  .sm-bar-fill { height:100%; border-radius:2px; transition:width 0.8s ease; }
+  .sm-bar-fill.green  { background:var(--green); box-shadow:0 0 6px var(--green); }
+  .sm-bar-fill.amber  { background:var(--amber); box-shadow:0 0 6px var(--amber); }
+  .sm-bar-fill.cyan   { background:var(--cyan);  box-shadow:0 0 6px var(--cyan); }
+  .sm-bar-fill.red    { background:var(--red);   box-shadow:0 0 6px var(--red); }
+  .sm-sub { font-size:0.6rem; color:var(--muted); }
+
+  /* Spark line */
+  .spark { width:100%; height:40px; }
+  .spark polyline { fill:none; stroke:var(--green); stroke-width:1.5; vector-effect:non-scaling-stroke; }
+  .spark-area { fill:url(#sparkGrad); stroke:none; }
+
+  /* Process table */
+  .sysmon-procs { margin-top:0.4rem; }
+  .proc-header { display:grid; grid-template-columns:1fr 60px 70px 80px; gap:0.5rem; padding:0.3rem 0; border-bottom:1px solid var(--border); margin-bottom:0.3rem; }
+  .proc-header span { font-size:0.6rem; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; }
+  .proc-row { display:grid; grid-template-columns:1fr 60px 70px 80px; gap:0.5rem; padding:0.3rem 0; border-bottom:1px solid #111711; align-items:center; }
+  .proc-row:last-child { border-bottom:none; }
+  .proc-name { font-size:0.68rem; color:var(--white); }
+  .proc-pid  { font-size:0.65rem; color:var(--muted); }
+  .proc-cpu  { font-size:0.68rem; color:var(--amber); text-align:right; }
+  .proc-mem  { font-size:0.68rem; color:var(--cyan);  text-align:right; }
+  .proc-status-dot { width:6px; height:6px; border-radius:50%; background:var(--green); display:inline-block; animation:pulse 2s infinite; }
+
+  /* Bottom controls */
+  .sysmon-controls { display:flex; gap:0.6rem; margin-top:1.2rem; flex-wrap:wrap; align-items:center; }
+  .sysmon-btn {
+    font-family:var(--font-mono); font-size:0.65rem; letter-spacing:0.08em;
+    padding:0.4rem 0.8rem; border:1px solid var(--border); background:var(--bg3);
+    color:var(--muted); cursor:none; transition:all 0.2s; border-radius:2px;
+  }
+  .sysmon-btn:hover { border-color:var(--green); color:var(--green); box-shadow:0 0 10px #00ff4115; }
+  .sysmon-btn.active { border-color:var(--green); color:var(--green); background:var(--green-pale); }
+  .sysmon-btn.danger:hover { border-color:var(--red); color:var(--red); }
+  .sysmon-uptime { font-size:0.62rem; color:var(--muted); margin-left:auto; }
+  .sysmon-uptime span { color:var(--green); }
+
+  /* Alert banner */
+  .alert-banner {
+    display:none; margin-top:0.8rem; padding:0.5rem 0.8rem;
+    background:#ff333518; border:1px solid var(--red); border-radius:3px;
+    font-size:0.68rem; color:var(--red); animation:fadeUp 0.3s ease;
+  }
+  .alert-banner.show { display:block; }
+
+  /* Log output */
+  .sysmon-log {
+    margin-top:1rem; background:var(--bg); border:1px solid var(--border);
+    border-radius:3px; padding:0.6rem 0.8rem; max-height:90px; overflow-y:auto;
+    font-size:0.65rem; line-height:1.7;
+  }
+  .log-entry { display:block; color:var(--muted); }
+  .log-entry .log-time { color:#2a3d2a; }
+  .log-entry .log-ok   { color:var(--green); }
+  .log-entry .log-warn { color:var(--amber); }
+  .log-entry .log-err  { color:var(--red); }
+
+  /* ── CONTACT ── */
+  .contact-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; }
+  .contact-card { background:var(--panel); border:1px solid var(--border); padding:1.5rem; display:flex; flex-direction:column; gap:0.5rem; transition:all 0.3s; cursor:none; text-decoration:none; overflow:hidden; min-width:0; }
+  .contact-card:hover { border-color:var(--green); transform:translateY(-3px); box-shadow:0 6px 25px rgba(0,255,65,0.08); }
+  .contact-icon { font-size:1.3rem; }
+  .contact-label { font-size:0.63rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; }
+  .contact-value { font-size:0.76rem; color:var(--white); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; max-width:100%; }
+  .contact-card:hover .contact-value { color:var(--green); }
+
+  /* ── PARTICLES ── */
+  .particles { position:fixed; inset:0; pointer-events:none; z-index:1; }
+  .particle { position:absolute; background:var(--green); border-radius:50%; opacity:0; animation:floatUp var(--dur,15s) linear var(--delay,0s) infinite; }
+  @keyframes floatUp { 0%{transform:translateY(100vh) translateX(0);opacity:0;} 10%{opacity:0.35;} 90%{opacity:0.15;} 100%{transform:translateY(-10vh) translateX(var(--drift,20px));opacity:0;} }
+
+  footer { border-top:1px solid var(--border); padding:2rem; text-align:center; font-size:0.7rem; color:var(--muted); }
+  footer span { color:var(--green-dim); }
+
+  [data-reveal] { opacity:0; transform:translateY(30px); transition:opacity 0.6s ease,transform 0.6s ease; }
+  [data-reveal].visible { opacity:1; transform:none; }
+
+  @media(max-width:980px) {
+    .hero-grid { grid-template-columns:1fr; }
+    .hero-right { display:none; }
+    .about-grid { grid-template-columns:1fr; }
+    .sysmon-grid { grid-template-columns:1fr; }
+  }
+  @media(max-width:600px) {
+    .nav-links { display:none; }
+    .hero-stats { gap:1.5rem; }
+    .projects-grid { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div class="scroll-progress" id="scrollProg"></div>
+<div class="particles" id="particles"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">sujal<span>@devops</span>:~$</div>
+  <div class="nav-links">
+    <a href="#about">./about</a>
+    <a href="#experience">./experience</a>
+    <a href="#skills">./skills</a>
+    <a href="#projects">./projects</a>
+    <a href="#sysmon">./sysmon</a>
+    <a href="#contact">./contact</a>
+  </div>
+  <div class="nav-status"><div class="status-dot"></div><span>AVAILABLE FOR WORK</span></div>
+</nav>
+
+<!-- ══════════════ HERO ══════════════ -->
+<section id="hero">
+  <div class="hero-grid">
+    <!-- LEFT: all text -->
+    <div class="hero-left">
+      <div class="terminal-prompt">
+        <span class="p-green">sujal</span>@<span class="p-cyan">devops-machine</span>:~$ <span style="color:var(--white)">whoami</span>
+      </div>
+      <h1 class="hero-name">Sujal Bhandari</h1>
+      <div class="hero-title">DevOps Engineer &amp; Cloud Infrastructure Specialist</div>
+      <p class="hero-desc">
+        Building resilient pipelines, orchestrating containers, and automating infrastructure.<br>
+        Passionate about <span class="hl">CI/CD</span>, <span class="hl">Kubernetes</span>, and <span class="hl">cloud-native</span> architectures that scale.
+      </p>
+      <div class="hero-cta">
+        <a href="#experience" class="btn btn-primary">$ view ./experience</a>
+        <a href="#contact" class="btn btn-outline">$ ./contact.sh</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item"><span class="stat-num">2+</span><span class="stat-label">Years Experience</span></div>
+        <div class="stat-item"><span class="stat-num">∞</span><span class="stat-label">Pipelines Deployed</span></div>
+        <div class="stat-item"><span class="stat-num">0</span><span class="stat-label">Prod Incidents (Today)</span></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: terminal card -->
+    <div class="hero-right">
+      <div class="terminal-window">
+        <div class="terminal-bar">
+          <div class="t-dot red"></div><div class="t-dot yellow"></div><div class="t-dot green"></div>
+          <div class="t-bar-title">sujal — bash — 80×24</div>
+        </div>
+        <div class="terminal-body">
+          <span class="t-line"><span class="t-ps1">❯</span> <span class="t-cmd">cat profile.json</span></span>
+          <span class="t-line">&nbsp;</span>
+          <span class="t-line"><span class="t-key">"name"</span><span class="t-out">: </span><span class="t-val">"Sujal Bhandari"</span><span class="t-out">,</span></span>
+          <span class="t-line"><span class="t-key">"role"</span><span class="t-out">: </span><span class="t-val">"DevOps Engineer"</span><span class="t-out">,</span></span>
+          <span class="t-line"><span class="t-key">"current"</span><span class="t-out">: </span><span class="t-val">"UnifyApps"</span><span class="t-out">,</span></span>
+          <span class="t-line"><span class="t-key">"prev"</span><span class="t-out">: </span><span class="t-val">"Xebia"</span><span class="t-out">,</span></span>
+          <span class="t-line"><span class="t-key">"ai_projects"</span><span class="t-out">: </span><span class="t-val">true</span><span class="t-out">,</span></span>
+          <span class="t-line"><span class="t-key">"status"</span><span class="t-out">: </span><span class="t-success">"🟢 available"</span></span>
+          <span class="t-line">&nbsp;</span>
+          <span class="t-line"><span class="t-ps1">❯</span> <span class="t-cmd">kubectl get pods -A</span></span>
+          <span class="t-line"><span class="t-out">prod&nbsp;&nbsp;&nbsp;api-7f9d4b&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="t-success">Running</span></span>
+          <span class="t-line"><span class="t-out">prod&nbsp;&nbsp;&nbsp;worker-6c8b2f&nbsp;&nbsp;</span><span class="t-success">Running</span></span>
+          <span class="t-line"><span class="t-out">stage&nbsp;&nbsp;frontend-9d5e1a</span><span class="t-success">Running</span></span>
+          <span class="t-line">&nbsp;</span>
+          <span class="t-line"><span class="t-ps1">❯</span> <span class="t-cmd">terraform apply</span></span>
+          <span class="t-line"><span class="t-success">✔ Resources: 12 added.</span></span>
+          <span class="t-line"><span class="t-ps1">❯</span> <span class="blink"></span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ ABOUT ══════════════ -->
+<section id="about">
+  <div class="container">
+    <div class="section-header" data-reveal>
+      <div class="section-tag">01 &nbsp; readme.md</div>
+      <h2 class="section-title">About <span class="accent">Me</span></h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-text" data-reveal>
+        <p>Hello World! I'm <span class="hl">Sujal Bhandari</span>, a DevOps engineer who loves turning complex infrastructure challenges into clean, automated solutions.</p>
+        <p>Currently working as a <span class="hl-g">DevOps Engineer Intern at UnifyApps</span>, where I am working in real time projects, mananing cloud native infrastructure and architeting solutions. Previously I sharpened my skills as a <span class="hl">DevOps Intern at Xebia</span>.</p>
+        <!-- <p>I also work in <span class="hl-g">AI &amp; GenAI</span> — from deploying LLM inference pipelines to building RAG-based applications — bridging the worlds of DevOps and intelligent systems.</p> -->
+        <p>My philosophy: if you're doing it <span class="hl">more than once</span>, it should be <span class="hl-g">automated</span>. I live in the terminal, breathe YAML, and eat logs.</p>
+      </div>
+      <div data-reveal>
+        <div class="terminal-window">
+          <div class="terminal-bar">
+            <div class="t-dot red"></div><div class="t-dot yellow"></div><div class="t-dot green"></div>
+            <div class="t-bar-title">system_info.sh</div>
+          </div>
+          <div class="terminal-body">
+            <span class="t-line"><span class="t-ps1">$</span> <span class="t-cmd">uname -a</span></span>
+            <span class="t-line"><span class="t-out">SujalOS v2.0.26 #DevOps + AI(yes, the BuzzWord)</span></span>
+            <span class="t-line">&nbsp;</span>
+            <span class="t-line"><span class="t-ps1">$</span> <span class="t-cmd">ls ~/interests/</span></span>
+            <span class="t-line"><span class="t-val">CI_CD/&nbsp;&nbsp;</span><span class="t-val">Kubernetes/&nbsp;&nbsp;</span><span class="t-val">IaC/</span></span>
+            <span class="t-line"><span class="t-val">GenAI/&nbsp;&nbsp;</span><span class="t-val">FinOps/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="t-val">RAG/</span></span>
+            <span class="t-line">&nbsp;</span>
+            <span class="t-line"><span class="t-ps1">$</span> <span class="t-cmd">echo $CURRENT_EMPLOYER</span></span>
+            <span class="t-line"><span class="t-success">UnifyApps</span></span>
+            <span class="t-line">&nbsp;</span>
+            <span class="t-line"><span class="t-ps1">$</span> <span class="t-cmd">echo $LOCATION</span></span>
+            <span class="t-line"><span class="t-out">Varanasi, India 🇮🇳</span></span>
+            <span class="t-line"><span class="t-ps1">$</span> <span class="blink"></span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ EXPERIENCE ══════════════ -->
+<section id="experience">
+  <div class="container">
+    <div class="section-header" data-reveal>
+      <div class="section-tag">02 &nbsp; ./git log --oneline</div>
+      <h2 class="section-title">Work <span class="accent">Experience</span></h2>
+    </div>
+    <div class="exp-timeline">
+      <div class="exp-item" data-reveal>
+        <div class="exp-dot"></div>
+        <div class="exp-meta">
+          <div class="exp-company">UnifyApps</div>
+          <div class="exp-badge current">● CURRENT</div>
+        </div>
+        <div class="exp-role">DevOps Engineer Intern</div>
+        <div class="exp-date">2024 — Present &nbsp;|&nbsp; Internship</div>
+        <ul class="exp-tasks">
+          <li>Managing <span>production deployments</span> and ensuring high availability of cloud infrastructure across environments.</li>
+          <li>Proactively monitoring systems and <span>resolving performance bottlenecks</span> to maintain optimal uptime and reliability.</li>
+          <li>Designed and implemented <span>Prometheus-based alerting pipelines</span> integrated with Slack for real-time incident notifications.</li>
+          <li>Collaborating directly with <span>clients to architect and provision infrastructure</span> tailored to their use cases.</li>
+          <li>Handling <span>incident response and alert triaging</span>, ensuring rapid mitigation and minimal downtime.</li>
+          <li>Working cross-functionally with <span>engineering and product teams</span> to improve system performance and deployment workflows.</li>
+          <li>Implemented <span>Karpenter-based node autoscaling</span> to optimize cost and dynamically scale Kubernetes workloads.</li>
+        </ul>
+      </div>
+      <div class="exp-item" data-reveal>
+        <div class="exp-dot" style="border-color:var(--amber);box-shadow:0 0 8px var(--amber);"></div>
+        <div class="exp-meta">
+          <div class="exp-company" style="color:var(--amber);text-shadow:0 0 8px #ffb70040;">Xebia</div>
+          <div class="exp-badge">INTERNSHIP</div>
+        </div>
+        <div class="exp-role">DevOps Intern</div>
+        <div class="exp-date">2023 — 2024 &nbsp;|&nbsp; Internship</div>
+        <ul class="exp-tasks">
+          <li>Contributed to a <span>microservices-based Flight Booking application</span>, ensuring scalability and cross-platform compatibility.</li>
+          <li>Designed and implemented <span>CI/CD pipelines</span> to enable faster and more reliable application deployments.</li>
+          <li>Configured <span>Datadog monitoring and alerting</span> for real-time system observability and proactive issue detection.</li>
+          <li>Integrated <span>AI-based SAST tools</span> and <span>ZAP DAST security scanning</span> into the deployment pipeline to identify and mitigate vulnerabilities.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ SKILLS ══════════════ -->
+<section id="skills">
+  <div class="container">
+    <div class="section-header" data-reveal>
+      <div class="section-tag">03 &nbsp; apt list --installed</div>
+      <h2 class="section-title">Tech <span class="accent">Stack</span></h2>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card" data-reveal>
+        <div class="skill-card-icon">🐳</div>
+        <div class="skill-card-title">Containers &amp; Orchestration</div>
+        <div class="skill-tags">
+          <span class="skill-tag highlight">Docker</span><span class="skill-tag highlight">Kubernetes</span>
+          <span class="skill-tag">Helm</span><span class="skill-tag">Docker Compose</span>
+          <span class="skill-tag">EKS</span>
+        </div>
+      </div>
+      <div class="skill-card" data-reveal>
+        <div class="skill-card-icon">⚙️</div>
+        <div class="skill-card-title">CI / CD</div>
+        <div class="skill-tags">
+          <span class="skill-tag highlight">GitHub Actions</span><span class="skill-tag highlight">Jenkins</span>
+          <span class="skill-tag">ArgoCD</span>
+          <!-- <span class="skill-tag">CircleCI</span><span class="skill-tag">Tekton</span> -->
+        </div>
+      </div>
+      <div class="skill-card" data-reveal>
+        <div class="skill-card-icon">☁️</div>
+        <div class="skill-card-title">Cloud Platforms</div>
+        <div class="skill-tags">
+          <span class="skill-tag highlight">AWS</span>
+          <span class="skill-tag">EC2</span><span class="skill-tag">S3</span>
+          <span class="skill-tag">IAM</span><span class="skill-tag">VPC</span>
+        </div>
+      </div>
+      <div class="skill-card" data-reveal>
+        <div class="skill-card-icon">🏗️</div>
+        <div class="skill-card-title">Infrastructure as Code</div>
+        <div class="skill-tags">
+          <span class="skill-tag highlight">Terraform</span><span class="skill-tag highlight">Ansible</span>
+          <span class="skill-tag">Karpenter</span>
+        </div>
+      </div>
+      <div class="skill-card" data-reveal>
+        <div class="skill-card-icon">📊</div>
+        <div class="skill-card-title">Monitoring &amp; Observability</div>
+        <div class="skill-tags">
+          <span class="skill-tag highlight">Prometheus</span><span class="skill-tag highlight">Grafana</span>
+          <span class="skill-tag">Opensearch</span><span class="skill-tag">Datadog</span>
+          <span class="skill-tag">Fluentbit</span><span class="skill-tag">Graylog</span>
+        </div>
+      </div>
+      <div class="skill-card" data-reveal>
+        <div class="skill-card-icon">💻</div>
+        <div class="skill-card-title">Languages &amp; Scripting</div>
+        <div class="skill-tags">
+          <span class="skill-tag highlight">Bash/Shell</span><span class="skill-tag highlight">Python</span>
+          <span class="skill-tag">YAML</span><span class="skill-tag">C/C++</span>
+          <span class="skill-tag">HCL</span><span class="skill-tag">Java</span>
+        </div>
+      <!-- </div>
+      <div class="skill-card ai-card" data-reveal style="border-color:#7b2fff25;">
+        <div class="skill-card-icon">🤖</div>
+        <div class="skill-card-title ai">AI / GenAI</div>
+        <div class="skill-tags">
+          <span class="skill-tag ai-tag">LangChain</span><span class="skill-tag ai-tag">OpenAI API</span>
+          <span class="skill-tag ai-tag">RAG</span><span class="skill-tag ai-tag">LLM Deployment</span>
+          <span class="skill-tag">Hugging Face</span><span class="skill-tag">Vector DBs</span>
+          <span class="skill-tag">Ollama</span><span class="skill-tag">MLOps</span>
+        </div>
+      </div> -->
+      
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ PROJECTS ══════════════ -->
+<section id="projects">
+  <div class="container">
+    <div class="section-header" data-reveal>
+      <div class="section-tag">04 &nbsp; ls ~/projects/</div>
+      <h2 class="section-title">Featured <span class="accent">Projects</span></h2>
+    </div>
+    <div class="projects-grid">
+
+      <div class="project-card" data-reveal>
+        <div class="project-header">
+          <div class="project-type">🐳 DevOps</div>
+          <!-- <div class="project-status live">✔ Live</div> -->
+        </div>
+        <h3 class="project-title">TravelEase</h3>
+        <p class="project-desc">
+          Developed and containerized the Booking microservice using Docker and orchestrated multi-container services via Docker Compose for local development and testing.<br>
+          Set up a Jenkins CI/CD pipeline enabling automated build, test, and deployment processes, reducing deployment time by 60%.<br>
+          Integrated Snyk AI-powered SAST scans and Trivy scans for Docker images and configuration files, achieving 100% vulnerability reporting coverage pre-deployment.
+        </p>
+        <div class="project-stack">
+          <span class="p-tag">Docker</span>
+          <span class="p-tag">AWS</span>
+          <span class="p-tag">Datadog</span>
+          <span class="p-tag">Jenkins</span>
+        </div>
+      </div>
+
+      <div class="project-card" data-reveal>
+        <div class="project-header">
+          <div class="project-type">🤖 AI/ML</div>
+          <!-- <div class="project-status live">✔ Completed</div> -->
+        </div>
+        <h3 class="project-title">AI-Based Weather Prediction System</h3>
+        <p class="project-desc">
+          Developed a machine learning pipeline using Random Forest Classifier and Regressor to predict rainfall likelihood and key weather parameters based on historical and live weather data.<br>
+          Achieved a Mean Squared Error (MSE) of 0.12 in rain prediction, demonstrating high model accuracy.<br>
+          Integrated live weather data retrieval from OpenWeatherMap API and automated preprocessing.
+        </p>
+        <div class="project-stack">
+          <span class="p-tag">GitHub Actions</span><span class="p-tag">Docker</span><span class="p-tag">Trivy</span>
+          <span class="p-tag">AWS ECS</span><span class="p-tag">ECR</span>
+        </div>
+      </div>
+
+      <!-- <div class="project-card" data-reveal>
+        <div class="project-header">
+          <div class="project-type">🤖 GenAI</div>
+          <div class="project-status live">✔ Deployed</div>
+        </div>
+        <h3 class="project-title">RAG-Powered Knowledge Assistant</h3>
+        <p class="project-desc">Built a Retrieval-Augmented Generation pipeline using LangChain and OpenAI GPT, backed by a Chroma vector database. Containerised with Docker and deployed on Kubernetes with autoscaling.</p>
+        <div class="project-stack">
+          <span class="p-tag">LangChain</span><span class="p-tag">OpenAI</span><span class="p-tag">ChromaDB</span>
+          <span class="p-tag">FastAPI</span><span class="p-tag">Docker</span>
+        </div>
+      </div> -->
+
+      <!-- <div class="project-card" data-reveal>
+        <div class="project-header">
+          <div class="project-type">📊 Observability</div>
+          <div class="project-status live">✔ Live</div>
+        </div>
+        <h3 class="project-title">Full-Stack Monitoring Dashboard</h3>
+        <p class="project-desc">Implemented a complete observability stack using Prometheus for metrics scraping, Loki for log aggregation, and Grafana dashboards with custom alerting rules — deployed via Helm on a self-managed K8s cluster.</p>
+        <div class="project-stack">
+          <span class="p-tag">Prometheus</span><span class="p-tag">Grafana</span><span class="p-tag">Loki</span>
+          <span class="p-tag">Helm</span><span class="p-tag">Kubernetes</span>
+        </div>
+      </div> -->
+
+      <!-- <div class="project-card" data-reveal>
+        <div class="project-header">
+          <div class="project-type">🏗️ IaC</div>
+          <div class="project-status live">✔ Live</div>
+        </div>
+        <h3 class="project-title">Terraform AWS Multi-Env Infrastructure</h3>
+        <p class="project-desc">Wrote modular Terraform code to provision VPCs, subnets, EC2 instances, RDS, and IAM roles across dev, staging, and prod environments — with remote state in S3 and Terragrunt for DRY configs.</p>
+        <div class="project-stack">
+          <span class="p-tag">Terraform</span><span class="p-tag">Terragrunt</span><span class="p-tag">AWS</span>
+          <span class="p-tag">S3</span><span class="p-tag">RDS</span>
+        </div>
+      </div> -->
+
+      <div class="project-card" data-reveal>
+        <div class="project-header">
+          <div class="project-type">🧠 MLOps</div>
+          <div class="project-status wip">🔧 In Progress</div>
+        </div>
+        <h3 class="project-title">LLM Inference Serving Pipeline</h3>
+        <p class="project-desc">End-to-end MLOps pipeline to serve open-source LLMs via Ollama and HuggingFace on GCP. Includes CI/CD for model versioning, Prometheus metrics, and Grafana dashboards for latency monitoring.</p>
+        <div class="project-stack">
+          <span class="p-tag">Ollama</span><span class="p-tag">Hugging Face</span><span class="p-tag">GCP</span>
+          <span class="p-tag">Prometheus</span><span class="p-tag">GitHub Actions</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ INTERACTIVE SYSMON ══════════════ -->
+<section id="sysmon">
+  <div class="container">
+    <div class="section-header" data-reveal>
+      <div class="section-tag">05 &nbsp; htop — interactive system monitor</div>
+      <h2 class="section-title">Live <span class="accent">SysMon</span></h2>
+    </div>
+    <p data-reveal style="font-size:0.78rem;color:var(--muted);margin-bottom:1.8rem;max-width:560px;">
+      A simulated real-time system monitor for a DevOps server. Kill processes, trigger deployments, fire chaos tests — it's interactive. <span style="color:var(--green);">Go break something.</span>
+    </p>
+
+    <div data-reveal>
+    <div class="sysmon-shell">
+      <div class="sysmon-bar">
+        <div class="t-dot red"></div><div class="t-dot yellow"></div><div class="t-dot green"></div>
+        <span>sujal@prod-k8s-node-01 — htop</span>
+      </div>
+      <div class="sysmon-body">
+
+        <!-- Metric cards -->
+        <div class="sysmon-grid">
+          <!-- CPU -->
+          <div class="sysmon-metric">
+            <div class="sm-header">
+              <span class="sm-label">CPU Usage</span>
+              <span class="sm-value" id="cpu-val">---%</span>
+            </div>
+            <div class="sm-bar-wrap"><div class="sm-bar-fill green" id="cpu-bar" style="width:0%"></div></div>
+            <div class="sm-sub" id="cpu-sub">4 cores · load avg: 0.00</div>
+            <svg class="spark" id="cpu-spark" viewBox="0 0 120 40" preserveAspectRatio="none">
+              <defs><linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00ff41" stop-opacity="0.3"/><stop offset="100%" stop-color="#00ff41" stop-opacity="0"/></linearGradient></defs>
+              <polygon class="spark-area" id="cpu-area" points=""/>
+              <polyline id="cpu-line" points=""/>
+            </svg>
+          </div>
+          <!-- RAM -->
+          <div class="sysmon-metric">
+            <div class="sm-header">
+              <span class="sm-label">Memory</span>
+              <span class="sm-value" id="mem-val">--- MB</span>
+            </div>
+            <div class="sm-bar-wrap"><div class="sm-bar-fill cyan" id="mem-bar" style="width:0%"></div></div>
+            <div class="sm-sub" id="mem-sub">8192 MB total</div>
+            <svg class="spark" id="mem-spark" viewBox="0 0 120 40" preserveAspectRatio="none">
+              <polygon class="spark-area" style="fill:url(#sparkGrad);opacity:0.5;filter:hue-rotate(180deg)" id="mem-area" points=""/>
+              <polyline id="mem-line" points="" style="stroke:var(--cyan)"/>
+            </svg>
+          </div>
+          <!-- Disk -->
+          <div class="sysmon-metric">
+            <div class="sm-header">
+              <span class="sm-label">Disk I/O</span>
+              <span class="sm-value" id="disk-val">-- MB/s</span>
+            </div>
+            <div class="sm-bar-wrap"><div class="sm-bar-fill amber" id="disk-bar" style="width:0%"></div></div>
+            <div class="sm-sub" id="disk-sub">Read: 0 MB/s · Write: 0 MB/s</div>
+          </div>
+          <!-- Network -->
+          <div class="sysmon-metric">
+            <div class="sm-header">
+              <span class="sm-label">Network</span>
+              <span class="sm-value" id="net-val">-- Mbps</span>
+            </div>
+            <div class="sm-bar-wrap"><div class="sm-bar-fill green" id="net-bar" style="width:0%"></div></div>
+            <div class="sm-sub" id="net-sub">↑ 0 Mbps · ↓ 0 Mbps</div>
+          </div>
+        </div>
+
+        <!-- Process table -->
+        <div class="sysmon-procs">
+          <div class="proc-header">
+            <span>Process</span><span>PID</span><span style="text-align:right">CPU%</span><span style="text-align:right">MEM</span>
+          </div>
+          <div id="proc-table"></div>
+        </div>
+
+        <!-- Alert -->
+        <div class="alert-banner" id="alert-banner"></div>
+
+        <!-- Log -->
+        <div class="sysmon-log" id="sysmon-log"></div>
+
+        <!-- Controls -->
+        <div class="sysmon-controls">
+          <button class="sysmon-btn active" id="btn-start" onclick="sysmonToggle()">⏸ Pause</button>
+          <button class="sysmon-btn" onclick="triggerDeploy()">🚀 Deploy</button>
+          <button class="sysmon-btn" onclick="triggerChaos()">💥 Chaos Test</button>
+          <button class="sysmon-btn" onclick="killTopProc()">☠️ Kill Process</button>
+          <button class="sysmon-btn danger" onclick="triggerIncident()">🔥 Incident</button>
+          <div class="sysmon-uptime">uptime: <span id="uptime-val">00:00:00</span></div>
+        </div>
+
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ CONTACT ══════════════ -->
+<section id="contact">
+  <div class="container">
+    <div class="section-header" data-reveal>
+      <div class="section-tag">06 &nbsp; ./contact.sh</div>
+      <h2 class="section-title">Get In <span class="accent">Touch</span></h2>
+    </div>
+    <p data-reveal style="font-size:0.82rem;color:var(--muted);margin-bottom:2rem;max-width:500px;">
+      Open to exciting DevOps roles, collaborations, and interesting infrastructure challenges. Let's build something resilient together.
+    </p>
+    <div class="contact-grid" data-reveal>
+      <a href="mailto:sujal.bhandari@email.com" class="contact-card">
+        <div class="contact-icon">📧</div>
+        <div class="contact-label">Email</div>
+        <div class="contact-value">sujalbhu@email.com</div>
+      </a>
+      <a href="https://linkedin.com/in/sujalbhandari" target="_blank" class="contact-card">
+        <div class="contact-icon">💼</div>
+        <div class="contact-label">LinkedIn</div>
+        <div class="contact-value">linkedin.com/in/sujal23b</div>
+      </a>
+      <a href="https://github.com/sujalbhandari" target="_blank" class="contact-card">
+        <div class="contact-icon">🐙</div>
+        <div class="contact-label">GitHub</div>
+        <div class="contact-value">github.com/suj4lb</div>
+      </a>
+      <a href="#" class="contact-card">
+        <div class="contact-icon">🌍</div>
+        <div class="contact-label">Location</div>
+        <div class="contact-value">India 🇮🇳</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>sujal@devops</span>:~$ echo "Built with ❤️ and too much ☕ by Sujal Bhandari"
+  <br><br>
+  <span style="color:var(--muted);font-size:0.65rem;">© 2026 Sujal Bhandari — All systems operational 🟢</span>
+</footer>
+
+<script>
+/* ── cursor ── */
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top  = e.clientY + 'px';
+});
+
+/* ── scroll progress ── */
+window.addEventListener('scroll', () => {
+  const h = document.body.scrollHeight - window.innerHeight;
+  if (h > 0) document.getElementById('scrollProg').style.width = (window.scrollY / h * 100) + '%';
+});
+
+/* ── scroll reveal ── */
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('[data-reveal], .exp-item, .skill-card, .project-card').forEach(el => obs.observe(el));
+
+/* ── particles ── */
+const pEl = document.getElementById('particles');
+for (let i = 0; i < 25; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  const w = 1 + Math.random() * 2;
+  p.style.cssText = `left:${Math.random()*100}%;width:${w}px;height:${w}px;--dur:${10+Math.random()*20}s;--delay:${Math.random()*15}s;--drift:${(Math.random()-0.5)*80}px;`;
+  pEl.appendChild(p);
+}
+
+/* ── smooth scroll ── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+
+/* ══════════════════════════════════════
+   INTERACTIVE SYSMON
+══════════════════════════════════════ */
+let running   = true;
+let uptimeSec = 0;
+let tickCount = 0;
+
+// State
+const state = {
+  cpu: 28, mem: 3200, disk: 12, net: 45,
+  cpuHistory: Array(20).fill(28),
+  memHistory: Array(20).fill(3200),
+  incident: false,
+  deploying: false,
+  chaos: false,
+};
+
+const processes = [
+  { name: 'kubectl proxy',   pid: 1842, cpu: 3.2,  mem: 128,  alive: true },
+  { name: 'node-exporter',   pid: 2201, cpu: 1.1,  mem: 48,   alive: true },
+  { name: 'prometheus',      pid: 2389, cpu: 8.4,  mem: 512,  alive: true },
+  { name: 'grafana-server',  pid: 2501, cpu: 5.6,  mem: 320,  alive: true },
+  { name: 'argocd-server',   pid: 3102, cpu: 2.9,  mem: 256,  alive: true },
+  { name: 'api-gateway',     pid: 4001, cpu: 12.3, mem: 640,  alive: true },
+];
+
+function jitter(val, range, min, max) {
+  return Math.max(min, Math.min(max, val + (Math.random() - 0.5) * range));
+}
+
+function addLog(msg, type = 'ok') {
+  const log = document.getElementById('sysmon-log');
+  const now = new Date();
+  const ts  = now.toTimeString().slice(0,8);
+  const entry = document.createElement('span');
+  entry.className = 'log-entry';
+  entry.innerHTML = `<span class="log-time">[${ts}]</span> <span class="log-${type}">${msg}</span>`;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+  // keep max 30 lines
+  while (log.children.length > 30) log.removeChild(log.firstChild);
+}
+
+function showAlert(msg) {
+  const el = document.getElementById('alert-banner');
+  el.textContent = '⚠ ' + msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+function sparkPoints(history, w, h) {
+  const n = history.length;
+  const mx = Math.max(...history, 1);
+  const pts = history.map((v, i) => `${(i / (n-1)) * w},${h - (v / mx) * (h - 4) - 2}`).join(' ');
+  return pts;
+}
+
+function sparkArea(history, w, h) {
+  const n = history.length;
+  const mx = Math.max(...history, 1);
+  const top = history.map((v, i) => `${(i / (n-1)) * w},${h - (v / mx) * (h - 4) - 2}`).join(' ');
+  return `0,${h} ${top} ${w},${h}`;
+}
+
+function renderProcs() {
+  const el = document.getElementById('proc-table');
+  el.innerHTML = '';
+  const alive = processes.filter(p => p.alive).sort((a,b) => b.cpu - a.cpu);
+  alive.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'proc-row';
+    row.innerHTML = `
+      <span class="proc-name"><span class="proc-status-dot"></span> ${p.name}</span>
+      <span class="proc-pid">${p.pid}</span>
+      <span class="proc-cpu">${p.cpu.toFixed(1)}%</span>
+      <span class="proc-mem">${p.mem} MB</span>
+    `;
+    el.appendChild(row);
+  });
+}
+
+function tick() {
+  if (!running) return;
+  tickCount++;
+
+  // Drift metrics
+  if (state.incident) {
+    state.cpu  = jitter(state.cpu,  15, 80, 99);
+    state.mem  = jitter(state.mem,  200, 6000, 7800);
+  } else if (state.deploying) {
+    state.cpu  = jitter(state.cpu,  8, 50, 75);
+    state.mem  = jitter(state.mem,  100, 3000, 5000);
+  } else if (state.chaos) {
+    state.cpu  = jitter(state.cpu,  20, 30, 95);
+    state.mem  = jitter(state.mem,  300, 1500, 7000);
+  } else {
+    state.cpu  = jitter(state.cpu,  5, 10, 65);
+    state.mem  = jitter(state.mem,  80, 1800, 4200);
+  }
+  state.disk = jitter(state.disk, 8, 2, 80);
+  state.net  = jitter(state.net,  15, 5, 200);
+
+  // Update histories
+  state.cpuHistory.push(state.cpu); state.cpuHistory.shift();
+  state.memHistory.push(state.mem); state.memHistory.shift();
+
+  // Jitter proc CPU
+  processes.filter(p => p.alive).forEach(p => {
+    p.cpu = Math.max(0.1, p.cpu + (Math.random() - 0.5) * 2);
+  });
+
+  // CPU display
+  const cpuPct = Math.round(state.cpu);
+  document.getElementById('cpu-val').textContent  = cpuPct + '%';
+  document.getElementById('cpu-bar').style.width  = cpuPct + '%';
+  document.getElementById('cpu-bar').className    = 'sm-bar-fill ' + (cpuPct > 80 ? 'red' : cpuPct > 60 ? 'amber' : 'green');
+  const load = (state.cpu / 100 * 3.2).toFixed(2);
+  document.getElementById('cpu-sub').textContent  = `4 cores · load avg: ${load}`;
+  document.getElementById('cpu-line').setAttribute('points', sparkPoints(state.cpuHistory, 120, 40));
+  document.getElementById('cpu-area').setAttribute('points', sparkArea(state.cpuHistory, 120, 40));
+
+  // MEM display
+  const memMB  = Math.round(state.mem);
+  const memPct = Math.round(state.mem / 8192 * 100);
+  document.getElementById('mem-val').textContent  = memMB + ' MB';
+  document.getElementById('mem-bar').style.width  = memPct + '%';
+  document.getElementById('mem-bar').className    = 'sm-bar-fill ' + (memPct > 85 ? 'red' : memPct > 70 ? 'amber' : 'cyan');
+  document.getElementById('mem-sub').textContent  = `${memMB} / 8192 MB (${memPct}%)`;
+  document.getElementById('mem-line').setAttribute('points', sparkPoints(state.memHistory, 120, 40));
+  document.getElementById('mem-area').setAttribute('points', sparkArea(state.memHistory, 120, 40));
+
+  // DISK
+  const dr = (state.disk * 0.6).toFixed(1);
+  const dw = (state.disk * 0.4).toFixed(1);
+  document.getElementById('disk-val').textContent = state.disk.toFixed(1) + ' MB/s';
+  document.getElementById('disk-bar').style.width = Math.min(state.disk / 100 * 100, 100) + '%';
+  document.getElementById('disk-sub').textContent = `Read: ${dr} MB/s · Write: ${dw} MB/s`;
+
+  // NET
+  const nu = (state.net * 0.4).toFixed(0);
+  const nd = (state.net * 0.6).toFixed(0);
+  document.getElementById('net-val').textContent = state.net.toFixed(0) + ' Mbps';
+  document.getElementById('net-bar').style.width = Math.min(state.net / 250 * 100, 100) + '%';
+  document.getElementById('net-sub').textContent = `↑ ${nu} Mbps · ↓ ${nd} Mbps`;
+
+  renderProcs();
+
+  // Auto log entries
+  if (tickCount % 8 === 0) {
+    const msgs = [
+      ['Prometheus scrape OK — 142 metrics collected','ok'],
+      ['Grafana heartbeat OK','ok'],
+      ['kubectl health check passed','ok'],
+      ['ArgoCD sync: all apps healthy','ok'],
+      ['HPA scale event: replicas → 3','warn'],
+      ['Node disk usage at 71% — monitor','warn'],
+    ];
+    if (state.incident) {
+      addLog('HIGH CPU ALERT — threshold 80% exceeded', 'err');
+    } else {
+      const [m,t] = msgs[Math.floor(Math.random() * msgs.length)];
+      addLog(m, t);
+    }
+  }
+}
+
+// Uptime counter
+setInterval(() => {
+  uptimeSec++;
+  const h = String(Math.floor(uptimeSec/3600)).padStart(2,'0');
+  const m = String(Math.floor((uptimeSec%3600)/60)).padStart(2,'0');
+  const s = String(uptimeSec%60).padStart(2,'0');
+  document.getElementById('uptime-val').textContent = `${h}:${m}:${s}`;
+}, 1000);
+
+setInterval(tick, 1200);
+addLog('sysmon initialised — all systems nominal', 'ok');
+addLog('Prometheus scraping 4 node targets', 'ok');
+
+// Controls
+function sysmonToggle() {
+  running = !running;
+  const btn = document.getElementById('btn-start');
+  btn.textContent = running ? '⏸ Pause' : '▶ Resume';
+  btn.classList.toggle('active', running);
+  addLog(running ? 'Monitor resumed' : 'Monitor paused', running ? 'ok' : 'warn');
+}
+
+function triggerDeploy() {
+  state.deploying = true;
+  addLog('🚀 Deployment triggered — rolling update starting...', 'warn');
+  showAlert('Deployment in progress — expect elevated CPU');
+  setTimeout(() => {
+    state.deploying = false;
+    addLog('✔ Deployment complete — v1.4.2 rolled out', 'ok');
+  }, 8000);
+}
+
+function triggerChaos() {
+  state.chaos = true;
+  addLog('💥 Chaos test activated — injecting network latency', 'warn');
+  showAlert('Chaos Engineering mode ON — watch those metrics spike!');
+  setTimeout(() => {
+    state.chaos = false;
+    addLog('Chaos test ended — system stabilising', 'ok');
+  }, 10000);
+}
+
+function killTopProc() {
+  const alive = processes.filter(p => p.alive).sort((a,b) => b.cpu - a.cpu);
+  if (alive.length === 0) { addLog('No alive processes to kill', 'warn'); return; }
+  const top = alive[0];
+  top.alive = false;
+  addLog(`☠️  Process killed: ${top.name} [${top.pid}]`, 'err');
+  showAlert(`Process ${top.name} terminated — PID ${top.pid}`);
+  // resurrect after delay
+  setTimeout(() => {
+    top.alive = true;
+    top.pid = top.pid + Math.floor(Math.random()*100);
+    addLog(`Process restarted: ${top.name} [${top.pid}]`, 'ok');
+  }, 6000);
+}
+
+function triggerIncident() {
+  state.incident = true;
+  addLog('🔥 INCIDENT: Memory leak detected in api-gateway', 'err');
+  addLog('🔥 INCIDENT: CPU spike across all pods', 'err');
+  showAlert('PRODUCTION INCIDENT — SEV-1 triggered, on-call alerted');
+  setTimeout(() => {
+    state.incident = false;
+    addLog('Incident resolved — rolling restart applied', 'ok');
+    addLog('All pods back to healthy state', 'ok');
+  }, 12000);
+}
+</script>
+</body>
+</html>
